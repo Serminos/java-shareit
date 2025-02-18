@@ -10,6 +10,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -24,7 +25,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto create(UserDto userDto) {
-        isExistByEmail(userDto.getEmail());
+        checkIfEmailExists(userDto.getEmail(), null);
         final User user = userRepository.add(userMapper.toUser(userDto));
         return userMapper.toUserDto(user);
     }
@@ -33,7 +34,7 @@ public class UserServiceImpl implements UserService {
     public UserDto update(long userId, final UserDto userDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Не найден пользователя с id - [" + userId + "]"));
-        isExistByEmail(userDto.getEmail());
+        checkIfEmailExists(userDto.getEmail(), userDto.getId());
 
         if (Objects.nonNull(userDto.getName())) {
             user.setName(userDto.getName());
@@ -54,18 +55,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void removeById(long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Не найден пользователя с id - [" + userId + "]"));
+        userRepository.removeById(userId);
     }
 
-    private void isExistByEmail(String email) {
-        if (!Objects.nonNull(email)) {
-            return;
+    private void checkIfEmailExists(String email, Long excludedUserId) {
+        if (email == null || email.isEmpty()) {
+            return; // Email не указан, проверка не требуется
         }
-        for (User user : userRepository.findAll()) {
-            if (user.getEmail().equals(email)) {
-                throw new ConflictException("Пользователь с email = [" + email + "] уже есть.");
-            }
+
+        Optional<User> existingUser = userRepository.findByEmail(email);
+
+        if (existingUser.isPresent() && (excludedUserId == null || !existingUser.get().getId().equals(excludedUserId))) {
+            throw new ConflictException("Пользователь с email = [" + email + "] уже есть.");
         }
     }
 }

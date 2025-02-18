@@ -13,7 +13,7 @@ public interface ItemRepository {
 
     Item update(long itemId, ItemDto itemDto);
 
-    List<Item> findAllByUserId(long itemId);
+    List<Item> findAllByUserId(long userId);
 
     List<Item> findAllByText(String text);
 }

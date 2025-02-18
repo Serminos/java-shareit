@@ -18,6 +18,11 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public Optional<User> findByEmail(String email) {
+        return users.values().stream().filter(item -> item.getEmail().equals(email)).findFirst();
+    }
+
+    @Override
     public void removeById(long userId) {
         users.remove(userId);
     }

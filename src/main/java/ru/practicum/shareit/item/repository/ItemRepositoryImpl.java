@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.repository;
 
+import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -50,9 +51,12 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public List<Item> findAllByText(String text) {
+        if (StringUtils.isBlank(text)) {
+            return new ArrayList<>();
+        }
         return items.values().stream()
-                .filter(item -> (item.getName().equalsIgnoreCase(text.toLowerCase()) ||
-                        item.getDescription().equalsIgnoreCase(text.toLowerCase())))
+                .filter(item -> (item.getName().toLowerCase().contains(text.toLowerCase()) ||
+                        item.getDescription().toLowerCase().contains(text.toLowerCase())))
                 .filter(Item::getAvailable)
                 .collect(Collectors.toList());
     }

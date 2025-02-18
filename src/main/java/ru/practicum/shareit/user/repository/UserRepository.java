@@ -8,6 +8,8 @@ import java.util.Optional;
 public interface UserRepository {
     Optional<User> findById(long userId);
 
+    Optional<User> findByEmail(String email);
+
     void removeById(long userId);
 
     User add(User user);
