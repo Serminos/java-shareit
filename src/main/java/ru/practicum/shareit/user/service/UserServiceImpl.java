@@ -2,7 +2,7 @@ package ru.practicum.shareit.user.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.exception.ConflictException;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
@@ -23,17 +23,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto create(UserDto userDto) {
-        isExistByEmail(userDto.getEmail());
-        final User user = userRepository.add(userMapper.toUser(userDto));
+        User user = userRepository.save(userMapper.toUser(userDto));
         return userMapper.toUserDto(user);
     }
 
     @Override
-    public UserDto update(long userId, final UserDto userDto) {
+    @Transactional
+    public UserDto update(long userId, UserDto userDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Не найден пользователя с id - [" + userId + "]"));
-        isExistByEmail(userDto.getEmail());
 
         if (Objects.nonNull(userDto.getName())) {
             user.setName(userDto.getName());
@@ -41,8 +41,8 @@ public class UserServiceImpl implements UserService {
         if (Objects.nonNull(userDto.getEmail())) {
             user.setEmail(userDto.getEmail());
         }
-        userRepository.update(user);
-        return userMapper.toUserDto(user);
+        User userSaved = userRepository.save(user);
+        return userMapper.toUserDto(userSaved);
     }
 
     @Override
@@ -53,19 +53,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void removeById(long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Не найден пользователя с id - [" + userId + "]"));
+        userRepository.deleteById(userId);
     }
 
-    private void isExistByEmail(String email) {
-        if (!Objects.nonNull(email)) {
-            return;
-        }
-        for (User user : userRepository.findAll()) {
-            if (user.getEmail().equals(email)) {
-                throw new ConflictException("Пользователь с email = [" + email + "] уже есть.");
-            }
-        }
-    }
 }

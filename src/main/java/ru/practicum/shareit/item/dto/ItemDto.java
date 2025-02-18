@@ -13,14 +13,13 @@ import ru.practicum.shareit.validation.CreateObject;
 @Setter
 @Builder
 public class ItemDto {
-    Long id;            // уникальный идентификатор вещи
+    Long id;
     @NotBlank(groups = {CreateObject.class}, message = "Название вещи не может быть пустым")
-    String name;        // краткое название.
+    String name;
     @NotBlank(groups = {CreateObject.class}, message = "Описание вещи не может быть пустым")
-    String description; // развёрнутое описание.
+    String description;
     @NotNull(groups = {CreateObject.class}, message = "Статус вещие не может быть пустым")
-    Boolean available;  // статус о том, доступна или нет вещь для аренды
-    User owner;         // владелец вещи
-    ItemRequest request;    // если вещь была создана по запросу другого пользователя, то в этом
-                            // поле будет храниться ссылка на соответствующий запрос.
+    Boolean available;
+    User owner;
+    ItemRequest request;
 }

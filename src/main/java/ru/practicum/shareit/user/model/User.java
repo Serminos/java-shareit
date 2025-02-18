@@ -1,16 +1,23 @@
 package ru.practicum.shareit.user.model;
 
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
+@Entity
+@Table(name = "users")
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
-    Long id;        // уникальный идентификатор пользователя
-    String name;    // имя или логин пользователя.
-    String email;   // — адрес электронной почты (учтите, что два пользователя не могут
-                    // иметь одинаковый адрес электронной почты)
+    @Column(name = "id")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
+    @Column(name = "name")
+    String name;
+    @Column(name = "email")
+    String email;
 }
