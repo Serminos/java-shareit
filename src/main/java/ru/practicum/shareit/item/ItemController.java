@@ -4,7 +4,9 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemResponce;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.validation.CreateObject;
 
@@ -60,12 +62,13 @@ public class ItemController {
      * Просмотр информации о конкретной вещи по её идентификатору. Эндпоинт GET /items/{itemId}.
      * Информацию о вещи может просмотреть любой пользователь.
      *
+     * @param userId ИД владельца
      * @param itemId
      * @return ItemDto
      */
     @GetMapping("/{itemId}")
-    public ItemDto getItemById(@PathVariable Long itemId) {
-        return itemService.findById(itemId);
+    public ItemResponce getItemById(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId) {
+        return itemService.findById(userId, itemId);
     }
 
     /**
@@ -92,5 +95,13 @@ public class ItemController {
     @GetMapping("/search")
     public List<ItemDto> findAllByText(@RequestParam(value = "text", required = false) String text) {
         return itemService.findAllByText(text);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto saveComment(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                  @PathVariable Long itemId,
+                                  @Valid @RequestBody CommentDto commentDto) {
+        log.info("Пользователь с id {} отправил запрос с комментарием к вещи с id {} ", userId, itemId);
+        return itemService.saveComment(userId, itemId, commentDto);
     }
 }

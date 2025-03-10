@@ -28,7 +28,7 @@ public class UserController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDto create(@Validated(CreateObject.class) @RequestBody final UserDto userDto) {
+    public UserDto create(@Validated(CreateObject.class) @RequestBody UserDto userDto) {
         log.info("Запрос на добавление пользователя ");
         return userService.create(userDto);
     }

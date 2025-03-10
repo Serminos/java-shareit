@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class BookingDto {
     Long id;
-    LocalDateTime startTime;
-    LocalDateTime endTime;
+    LocalDateTime start;
+    LocalDateTime end;
     Item item;
     User booker;
     StatusType status;

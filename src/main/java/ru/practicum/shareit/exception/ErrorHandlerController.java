@@ -8,6 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.practicum.shareit.booking.BookingController;
 import ru.practicum.shareit.exception.exception.BadRequestException;
 import ru.practicum.shareit.exception.exception.ConflictException;
 import ru.practicum.shareit.exception.exception.ErrorResponse;
@@ -19,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-@RestControllerAdvice(assignableTypes = {ItemController.class, UserController.class})
+@RestControllerAdvice(assignableTypes = {ItemController.class, UserController.class, BookingController.class})
 public class ErrorHandlerController {
     private static final Logger log = LoggerFactory.getLogger(ErrorHandlerController.class);
 
