@@ -11,9 +11,6 @@ import ru.practicum.shareit.booking.service.BookingService;
 
 import java.util.List;
 
-/**
- * TODO Sprint add-bookings.
- */
 @Slf4j
 @RestController
 @RequestMapping(path = "/bookings")
@@ -51,14 +48,14 @@ public class BookingController {
 
     @GetMapping
     public List<BookingResponce> findAllByUserId(@RequestHeader("X-Sharer-User-Id") @NotNull Long userId,
-                                                 @RequestParam(defaultValue = "all") String state) {
+                                                 @RequestParam(defaultValue = "ALL") String state) {
         log.info("Запрос на получение всех бронирований пользователя с id " + userId);
         return bookingService.findAllByUserId(userId, state);
     }
 
     @GetMapping("/owner")
     public List<BookingResponce> findAllByOwnerId(@RequestHeader("X-Sharer-User-Id") @NotNull Long ownerId,
-                                                  @RequestParam(defaultValue = "all") String state) {
+                                                  @RequestParam(defaultValue = "ALL") String state) {
         log.info("Запрос на получение всех забронированных вещей пользователя с id " + ownerId);
         return bookingService.findAllByOwnerId(ownerId, state);
     }
