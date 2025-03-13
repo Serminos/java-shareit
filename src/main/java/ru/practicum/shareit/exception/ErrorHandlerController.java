@@ -14,13 +14,14 @@ import ru.practicum.shareit.exception.exception.ConflictException;
 import ru.practicum.shareit.exception.exception.ErrorResponse;
 import ru.practicum.shareit.exception.exception.NotFoundException;
 import ru.practicum.shareit.item.ItemController;
+import ru.practicum.shareit.request.RequestController;
 import ru.practicum.shareit.user.UserController;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-@RestControllerAdvice(assignableTypes = {ItemController.class, UserController.class, BookingController.class})
+@RestControllerAdvice(assignableTypes = {ItemController.class, UserController.class, BookingController.class, RequestController.class})
 public class ErrorHandlerController {
     private static final Logger log = LoggerFactory.getLogger(ErrorHandlerController.class);
 

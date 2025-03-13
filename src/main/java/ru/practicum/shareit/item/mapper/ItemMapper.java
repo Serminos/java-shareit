@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.mapper;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoForRequest;
 import ru.practicum.shareit.item.dto.ItemResponce;
 import ru.practicum.shareit.item.model.Item;
 
@@ -40,6 +41,15 @@ public class ItemMapper {
                 .description(item.getDescription())
                 .available(item.getAvailable())
                 .comments(comments)
+                .build();
+    }
+
+    public ItemDtoForRequest toItemDtoForRequest(Item item) {
+        return ItemDtoForRequest.builder()
+                .itemId(item.getId())
+                .ownerId(item.getOwner()
+                        .getId())
+                .name(item.getName())
                 .build();
     }
 }

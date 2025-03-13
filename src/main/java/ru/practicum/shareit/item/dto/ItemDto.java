@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.validation.CreateObject;
 
@@ -21,5 +21,5 @@ public class ItemDto {
     @NotNull(groups = {CreateObject.class}, message = "Статус вещие не может быть пустым")
     Boolean available;
     User owner;
-    ItemRequest request;
+    Request request;
 }
