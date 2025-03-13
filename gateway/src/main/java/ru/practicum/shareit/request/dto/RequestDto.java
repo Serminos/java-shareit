@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 public class RequestDto {
-    @NotBlank
+    @NotBlank(message = "описание не должно быть пустым")
     String description;
 }
