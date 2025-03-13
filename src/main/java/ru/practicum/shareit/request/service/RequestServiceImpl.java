@@ -3,6 +3,7 @@ package ru.practicum.shareit.request.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDtoForRequest;
 import ru.practicum.shareit.item.mapper.ItemMapper;
@@ -18,10 +19,13 @@ import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class RequestServiceImpl implements RequestService {
+    private static final Sort SORT_BY_CREATED_DESC = Sort.by(Sort.Direction.DESC, "created");
+
     private final RequestRepository requestRepository;
 
     private final RequestMapper requestMapper;
@@ -33,7 +37,6 @@ public class RequestServiceImpl implements RequestService {
     private final ItemRepository itemRepository;
 
     private final ItemMapper itemMapper;
-    private final Sort sort = Sort.by(Sort.Direction.DESC, "created");
 
     public RequestServiceImpl(RequestRepository itemRequestRepository, RequestMapper itemRequestMapper,
                               UserRepository userRepository, UserMapper userMapper,
@@ -47,21 +50,21 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional
     public RequestResponseDto save(Long userId, RequestDto requestDto) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователя с id = {} нет." + userId));
-        Request request = requestRepository.save(requestMapper.toRequest(requestDto,
-                user));
-        RequestResponseDto requestResponseDto =
-                requestMapper.toRequestResponseDto(request);
+        User user = getUserByIdOrThrow(userId);
+        Request request = requestRepository.save(requestMapper.toRequest(requestDto, user));
+        RequestResponseDto requestResponseDto = requestMapper.toRequestResponseDto(request);
         requestResponseDto.setRequestor(userMapper.toUserDto(user));
         return requestResponseDto;
     }
 
     @Override
     public List<RequestResponseDto> getAllByUserId(Long userId) {
-        List<Request> requests = requestRepository.findAllByRequestorId(userId, sort);
+        checkUserExists(userId);
+        List<Request> requests = requestRepository.findAllByRequestorId(userId, SORT_BY_CREATED_DESC);
         List<RequestResponseDto> list = new ArrayList<>();
+        // TODO later N+1
         for (Request request : requests) {
             RequestResponseDto requestResponseDto =
                     requestMapper.toRequestResponseDto(request);
@@ -76,22 +79,22 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public List<RequestResponseDto> findAllExceptUserId(Long userId) {
-        final List<Request> requests = requestRepository.findAllExceptUserId(userId, sort);
-        log.info("Получены все запросы кроме запросов пользователя с id = {}", userId);
-        final List<RequestResponseDto> list = new ArrayList<>();
-        for (Request request : requests) {
-            final RequestResponseDto requestResponseDto =
-                    requestMapper.toRequestResponseDto(request);
-            requestResponseDto.setRequestor(userMapper.toUserDto(request.getRequestor()));
-            list.add(requestResponseDto);
-        }
-        return list;
+        checkUserExists(userId);
+        List<Request> requests = requestRepository.findAllExceptUserId(userId, SORT_BY_CREATED_DESC);
+        return requests.stream()
+                .map(request -> {
+                    RequestResponseDto requestResponseDto = requestMapper.toRequestResponseDto(request);
+                    requestResponseDto.setRequestor(userMapper.toUserDto(request.getRequestor()));
+                    return requestResponseDto;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
     public RequestResponseDto getByRequestId(Long requestId, Long userId) {
-        Request request = requestRepository.findById(requestId)
-                .orElseThrow(() -> new NotFoundException("Запроса с id = {} нет." + requestId));
+        checkUserExists(userId);
+        Request request = getRequestByIdOrThrow(requestId);
+        
         RequestResponseDto requestResponseDto =
                 requestMapper.toRequestResponseDto(request);
         List<ItemDtoForRequest> items = itemRepository.findAllByRequest(request)
@@ -99,5 +102,21 @@ public class RequestServiceImpl implements RequestService {
         requestResponseDto.setItems(items);
         requestResponseDto.setRequestor(userMapper.toUserDto(request.getRequestor()));
         return requestResponseDto;
+    }
+
+    private User getUserByIdOrThrow(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id=%d не найден".formatted(userId)));
+    }
+
+    private Request getRequestByIdOrThrow(Long requestId) {
+        return requestRepository.findById(requestId)
+                .orElseThrow(() -> new NotFoundException("Запрос с id=%d не найден".formatted(requestId)));
+    }
+
+    private void checkUserExists(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new NotFoundException("Пользователь с id=%d не найден".formatted(userId));
+        }
     }
 }
