@@ -1,6 +1,5 @@
 package ru.practicum.shareit.user;
 
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -17,62 +16,37 @@ import ru.practicum.shareit.validation.UpdateObject;
 @Validated
 @Slf4j
 public class UserController {
-
+    private static final String ID_VALIDATION_MSG = "ID пользователя должно быть положительным числом";
     private final UserClient userClient;
-
 
     public UserController(UserClient userClient) {
         this.userClient = userClient;
     }
 
-    /**
-     * Создать пользователя в БД.
-     *
-     * @param userDto пользователь
-     * @return UserDto созданный пользователь.
-     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> create(@Validated(CreateObject.class) @RequestBody UserDto userDto) {
-        log.info("Запрос на добавление пользователя ");
+        log.info("Создание пользователя: [{}]", userDto.getEmail());
         return userClient.save(userDto);
     }
 
-    /**
-     * Обновить юзера в БД.
-     *
-     * @param userDto пользователь
-     * @param userId  ID обновляемого пользователя.
-     * @return UserDto обновлённый пользователь.
-     */
     @PatchMapping("/{userId}")
-    public ResponseEntity<Object> update(@PathVariable @NotNull @Positive long userId,
-                   @Validated(UpdateObject.class) @RequestBody UserDto userDto) {
-        log.info("Запрос на обновление пользователя [" + userId + "]");
+    public ResponseEntity<Object> update(@PathVariable @Positive(message = ID_VALIDATION_MSG) long userId,
+                                         @Validated(UpdateObject.class) @RequestBody UserDto userDto) {
+        log.info("Запрос на обновление пользователя [{}]", userId);
         return userClient.update(userId, userDto);
     }
 
-    /**
-     * Получить пользователя по ID.
-     *
-     * @param userId ID пользователя.
-     * @return UserDto - пользователь присутствует в БД.
-     * <p>null - пользователя нет в БД.</p>
-     */
     @GetMapping("/{userId}")
-    public ResponseEntity<Object> getUserById(@PathVariable @NotNull @Positive Long userId) {
-        log.info("Получить пользователя по ID [" + userId + "]");
+    public ResponseEntity<Object> getUserById(@PathVariable @Positive(message = ID_VALIDATION_MSG) Long userId) {
+        log.info("Запрос пользователя ID: [{}]", userId);
         return userClient.getUserById(userId);
     }
 
-    /**
-     * Удалить пользователя из БД.
-     *
-     * @param userId ID удаляемого пользователя.
-     */
     @DeleteMapping("/{userId}")
-    public void removeById(@PathVariable @NotNull @Positive Long userId) {
-        log.info("Запрос на удаление пользователя [" + userId + "]");
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeById(@PathVariable @Positive(message = ID_VALIDATION_MSG) Long userId) {
+        log.info("Удаление пользователя ID: [{}]", userId);
         userClient.removeById(userId);
     }
 }
