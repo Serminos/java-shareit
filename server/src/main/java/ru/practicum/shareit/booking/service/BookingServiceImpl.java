@@ -49,7 +49,7 @@ public class BookingServiceImpl implements BookingService {
         this.itemMapper = itemMapper;
     }
 
-    Sort sort = Sort.by(Sort.Direction.DESC, "start");
+    Sort sortByStartDesc = Sort.by(Sort.Direction.DESC, "start");
 
     @Override
     @Transactional
@@ -70,7 +70,6 @@ public class BookingServiceImpl implements BookingService {
             throw new BadRequestException("Дата окончания бронирования не может быть раньше или равна дате начала");
         }
         Booking booking = bookingRepository.save(bookingMapper.toBooking(bookingRequest, user, item));
-        log.info("Запрос на бронирование вещи с id {} успешно сохранен", bookingRequest.getItemId());
         return bookingMapper.toBookingResponce(booking, userMapper.toUserDto(user), itemMapper.toItemDto(item));
     }
 
@@ -84,7 +83,7 @@ public class BookingServiceImpl implements BookingService {
         }
         if (!booking.getStatus().equals(StatusType.WAITING)) {
             throw new BadRequestException("Нельзя подтверждать бронирование" +
-                    " если оно не находится в ожидании подтвержления");
+                    " если оно не находится в ожидании подтверждения");
         }
         if (approved) {
             booking.setStatus(StatusType.APPROVED);
@@ -92,7 +91,6 @@ public class BookingServiceImpl implements BookingService {
             booking.setStatus(StatusType.REJECTED);
         }
         Booking updateBooking = bookingRepository.save(booking);
-        log.info("Выполнен запрос на подтверждение бронирование вещи с id " + bookingId);
         return bookingMapper.toBookingResponce(updateBooking,
                 userMapper.toUserDto(booking.getBooker()), itemMapper.toItemDto(booking.getItem()));
     }
@@ -114,13 +112,17 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingResponce> findAllByUserId(Long userId, String state) {
         userRepository.findById(userId);
         List<Booking> bookings = switch (state) {
-            case "ALL" -> bookingRepository.findAllByBookerId(userId, sort);
+            case "ALL" -> bookingRepository.findAllByBookerId(userId, sortByStartDesc);
             case "CURRENT" -> bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfter(userId,
-                    LocalDateTime.now(), LocalDateTime.now(), sort);
-            case "PAST" -> bookingRepository.findAllByBookerIdAndEndBefore(userId, LocalDateTime.now(), sort);
-            case "FUTURE" -> bookingRepository.findAllByBookerIdAndStartAfter(userId, LocalDateTime.now(), sort);
-            case "WAITING" -> bookingRepository.findAllByBookerIdAndStatusIs(userId, StatusType.WAITING.toString(), sort);
-            case "REJECTED" -> bookingRepository.findAllByBookerIdAndStatusIs(userId, StatusType.REJECTED.toString(), sort);
+                    LocalDateTime.now(), LocalDateTime.now(), sortByStartDesc);
+            case "PAST" ->
+                    bookingRepository.findAllByBookerIdAndEndBefore(userId, LocalDateTime.now(), sortByStartDesc);
+            case "FUTURE" ->
+                    bookingRepository.findAllByBookerIdAndStartAfter(userId, LocalDateTime.now(), sortByStartDesc);
+            case "WAITING" ->
+                    bookingRepository.findAllByBookerIdAndStatusIs(userId, StatusType.WAITING.toString(), sortByStartDesc);
+            case "REJECTED" ->
+                    bookingRepository.findAllByBookerIdAndStatusIs(userId, StatusType.REJECTED.toString(), sortByStartDesc);
             default -> throw new BadRequestException("Неверно передан параметр state");
         };
         return bookings.stream()
@@ -137,13 +139,17 @@ public class BookingServiceImpl implements BookingService {
             throw new BadRequestException("у пользователя пока нет вещей");
         }
         List<Booking> bookings = switch (state) {
-            case "ALL" -> bookingRepository.findAllByItemOwnerId(ownerId, sort);
+            case "ALL" -> bookingRepository.findAllByItemOwnerId(ownerId, sortByStartDesc);
             case "CURRENT" -> bookingRepository.findAllByItemOwnerIdAndStartBeforeAndEndAfter(ownerId,
-                    LocalDateTime.now(), LocalDateTime.now(), sort);
-            case "PAST" -> bookingRepository.findAllByItemOwnerIdAndEndBefore(ownerId, LocalDateTime.now(), sort);
-            case "FUTURE" -> bookingRepository.findAllByItemOwnerIdAndStartAfter(ownerId, LocalDateTime.now(), sort);
-            case "WAITING" -> bookingRepository.findAllByItemOwnerIdAndStatusIs(ownerId, StatusType.WAITING.toString(), sort);
-            case "REJECTED" -> bookingRepository.findAllByItemOwnerIdAndStatusIs(ownerId, StatusType.REJECTED.toString(), sort);
+                    LocalDateTime.now(), LocalDateTime.now(), sortByStartDesc);
+            case "PAST" ->
+                    bookingRepository.findAllByItemOwnerIdAndEndBefore(ownerId, LocalDateTime.now(), sortByStartDesc);
+            case "FUTURE" ->
+                    bookingRepository.findAllByItemOwnerIdAndStartAfter(ownerId, LocalDateTime.now(), sortByStartDesc);
+            case "WAITING" ->
+                    bookingRepository.findAllByItemOwnerIdAndStatusIs(ownerId, StatusType.WAITING.toString(), sortByStartDesc);
+            case "REJECTED" ->
+                    bookingRepository.findAllByItemOwnerIdAndStatusIs(ownerId, StatusType.REJECTED.toString(), sortByStartDesc);
             default -> throw new BadRequestException("Неверно передан параметр state");
         };
         return bookings.stream()

@@ -80,7 +80,7 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public List<RequestResponseDto> findAllExceptUserId(Long userId) {
         checkUserExists(userId);
-        List<Request> requests = requestRepository.findAllExceptUserId(userId, SORT_BY_CREATED_DESC);
+        List<Request> requests = requestRepository.findAllByRequestorIdNot(userId, SORT_BY_CREATED_DESC);
         return requests.stream()
                 .map(request -> {
                     RequestResponseDto requestResponseDto = requestMapper.toRequestResponseDto(request);
@@ -91,8 +91,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public RequestResponseDto getByRequestId(Long requestId, Long userId) {
-        checkUserExists(userId);
+    public RequestResponseDto getByRequestId(Long requestId) {
         Request request = getRequestByIdOrThrow(requestId);
 
         RequestResponseDto requestResponseDto =

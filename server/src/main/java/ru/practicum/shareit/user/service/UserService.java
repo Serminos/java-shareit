@@ -10,5 +10,4 @@ public interface UserService {
     UserDto getUserById(long userId);
 
     void removeById(long userId);
-
 }

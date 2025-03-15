@@ -40,10 +40,9 @@ public class RequestController {
     }
 
     @GetMapping("/{requestId}")
-    public RequestResponseDto getByRequestId(@PathVariable Long requestId,
-                                             @RequestHeader("X-Sharer-User-Id") Long userId) {
+    public RequestResponseDto getByRequestId(@PathVariable Long requestId) {
         log.info("Запрос на получение данных об одном конкретном запросе(вещи)" +
                 " и все ответы на него с id = [{}]", requestId);
-        return itemRequestService.getByRequestId(requestId, userId);
+        return itemRequestService.getByRequestId(requestId);
     }
 }

@@ -12,5 +12,5 @@ public interface RequestService {
 
     List<RequestResponseDto> findAllExceptUserId(Long userId);
 
-    RequestResponseDto getByRequestId(Long requestId, Long userId);
+    RequestResponseDto getByRequestId(Long requestId);
 }

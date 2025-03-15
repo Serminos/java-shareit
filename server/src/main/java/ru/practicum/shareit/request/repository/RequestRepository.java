@@ -9,5 +9,5 @@ import java.util.List;
 public interface RequestRepository extends JpaRepository<Request, Long> {
     List<Request> findAllByRequestorId(Long requestorId, Sort sort);
 
-    List<Request> findAllExceptUserId(Long requestorId, Sort sort);
+    List<Request> findAllByRequestorIdNot(Long requestorId, Sort sort);
 }
