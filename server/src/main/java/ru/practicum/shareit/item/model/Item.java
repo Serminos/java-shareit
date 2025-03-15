@@ -12,6 +12,7 @@ import ru.practicum.shareit.user.model.User;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(of = "id")
 public class Item {
     @Column(name = "id")
     @Id

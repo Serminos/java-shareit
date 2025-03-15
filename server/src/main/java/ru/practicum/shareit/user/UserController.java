@@ -62,6 +62,7 @@ public class UserController {
      * @param userId ID удаляемого пользователя.
      */
     @DeleteMapping("/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeById(@PathVariable Long userId) {
         log.info("Запрос на удаление пользователя [" + userId + "]");
         userService.removeById(userId);

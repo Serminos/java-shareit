@@ -2,7 +2,7 @@ package ru.practicum.shareit.booking.mapper;
 
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.dto.BookingRequest;
-import ru.practicum.shareit.booking.dto.BookingResponce;
+import ru.practicum.shareit.booking.dto.BookingResponse;
 import ru.practicum.shareit.booking.enums.StatusType;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -22,9 +22,9 @@ public class BookingMapper {
                 .status(StatusType.WAITING).build();
     }
 
-    public BookingResponce toBookingResponce(Booking booking, UserDto userDto,
+    public BookingResponse toBookingResponce(Booking booking, UserDto userDto,
                                              ItemDto itemDto) {
-        return BookingResponce.builder()
+        return BookingResponse.builder()
                 .id(booking.getId())
                 .start(booking.getStart())
                 .end(booking.getEnd())

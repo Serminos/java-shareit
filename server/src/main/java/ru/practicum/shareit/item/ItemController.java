@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -30,6 +31,7 @@ public class ItemController {
      * @return добавленная в БД вещь.
      */
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public ItemDto add(@RequestHeader(value = "X-Sharer-User-Id", required = false) Long userId,
                        @RequestBody ItemDto itemDto) {
         log.info("Запрос на добавление новой вещи");

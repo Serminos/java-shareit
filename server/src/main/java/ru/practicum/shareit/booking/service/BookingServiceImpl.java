@@ -5,7 +5,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingRequest;
-import ru.practicum.shareit.booking.dto.BookingResponce;
+import ru.practicum.shareit.booking.dto.BookingResponse;
 import ru.practicum.shareit.booking.enums.StatusType;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
@@ -53,9 +53,10 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
-    public BookingResponce saveRequest(BookingRequest bookingRequest, Long userId) {
+    public BookingResponse saveRequest(BookingRequest bookingRequest, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователя с id = {" + userId + "} нет."));
+
         Item item = itemRepository.findById(bookingRequest.getItemId())
                 .orElseThrow(() -> new NotFoundException("Вещи с id = {" + bookingRequest.getItemId() + "} нет."));
         if (item.getOwner().getId().equals(userId)) {
@@ -75,7 +76,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
-    public BookingResponce approved(Long ownerId, Long bookingId, boolean approved) {
+    public BookingResponse approved(Long ownerId, Long bookingId, boolean approved) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Такого запроса на бронирование не было"));
         if (!ownerId.equals(booking.getItem().getOwner().getId())) {
@@ -96,7 +97,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingResponce findById(Long userId, Long bookingId) {
+    public BookingResponse findById(Long userId, Long bookingId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Такого запроса на бронирование не было"));
         if (!booking.getBooker().getId().equals(userId)
@@ -109,8 +110,9 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingResponce> findAllByUserId(Long userId, String state) {
-        userRepository.findById(userId);
+    public List<BookingResponse> findAllByUserId(Long userId, String state) {
+        userRepository.findById(userId).orElseThrow(() -> new NotFoundException(
+                "Пользователя с id = [%d] нет.".formatted(userId)));
         List<Booking> bookings = switch (state) {
             case "ALL" -> bookingRepository.findAllByBookerId(userId, sortByStartDesc);
             case "CURRENT" -> bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfter(userId,
@@ -120,9 +122,9 @@ public class BookingServiceImpl implements BookingService {
             case "FUTURE" ->
                     bookingRepository.findAllByBookerIdAndStartAfter(userId, LocalDateTime.now(), sortByStartDesc);
             case "WAITING" ->
-                    bookingRepository.findAllByBookerIdAndStatusIs(userId, StatusType.WAITING.toString(), sortByStartDesc);
+                    bookingRepository.findAllByBookerIdAndStatusIs(userId, StatusType.WAITING, sortByStartDesc);
             case "REJECTED" ->
-                    bookingRepository.findAllByBookerIdAndStatusIs(userId, StatusType.REJECTED.toString(), sortByStartDesc);
+                    bookingRepository.findAllByBookerIdAndStatusIs(userId, StatusType.REJECTED, sortByStartDesc);
             default -> throw new BadRequestException("Неверно передан параметр state");
         };
         return bookings.stream()
@@ -132,7 +134,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingResponce> findAllByOwnerId(Long ownerId, String state) {
+    public List<BookingResponse> findAllByOwnerId(Long ownerId, String state) {
         userRepository.findById(ownerId)
                 .orElseThrow(() -> new NotFoundException("Пользователя с id = {} нет." + ownerId));
         if (itemRepository.findAllByOwnerId(ownerId).isEmpty()) {
@@ -147,9 +149,9 @@ public class BookingServiceImpl implements BookingService {
             case "FUTURE" ->
                     bookingRepository.findAllByItemOwnerIdAndStartAfter(ownerId, LocalDateTime.now(), sortByStartDesc);
             case "WAITING" ->
-                    bookingRepository.findAllByItemOwnerIdAndStatusIs(ownerId, StatusType.WAITING.toString(), sortByStartDesc);
+                    bookingRepository.findAllByItemOwnerIdAndStatusIs(ownerId, StatusType.WAITING, sortByStartDesc);
             case "REJECTED" ->
-                    bookingRepository.findAllByItemOwnerIdAndStatusIs(ownerId, StatusType.REJECTED.toString(), sortByStartDesc);
+                    bookingRepository.findAllByItemOwnerIdAndStatusIs(ownerId, StatusType.REJECTED, sortByStartDesc);
             default -> throw new BadRequestException("Неверно передан параметр state");
         };
         return bookings.stream()

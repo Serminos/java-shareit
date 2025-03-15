@@ -1,6 +1,7 @@
 package ru.practicum.shareit.request;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.RequestDto;
 import ru.practicum.shareit.request.dto.RequestResponseDto;
@@ -19,6 +20,7 @@ public class RequestController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public RequestResponseDto saveRequest(@RequestHeader("X-Sharer-User-Id") Long userId,
                                           @RequestBody RequestDto requestDto) {
         log.info("Создание нового запроса вещи пользователем с id = [{}] ", userId);

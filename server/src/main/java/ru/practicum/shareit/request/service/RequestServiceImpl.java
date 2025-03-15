@@ -64,7 +64,6 @@ public class RequestServiceImpl implements RequestService {
         checkUserExists(userId);
         List<Request> requests = requestRepository.findAllByRequestorId(userId, SORT_BY_CREATED_DESC);
         List<RequestResponseDto> list = new ArrayList<>();
-        // TODO later N+1
         for (Request request : requests) {
             RequestResponseDto requestResponseDto =
                     requestMapper.toRequestResponseDto(request);

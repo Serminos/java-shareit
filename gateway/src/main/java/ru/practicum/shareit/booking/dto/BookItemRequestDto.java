@@ -5,12 +5,14 @@ import jakarta.validation.constraints.FutureOrPresent;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import ru.practicum.shareit.validation.StartBeforeEnd;
 
 import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@StartBeforeEnd
 public class BookItemRequestDto {
 	private long itemId;
 	@FutureOrPresent(message = "Дата начала бронирования не должна быть в прошлом")

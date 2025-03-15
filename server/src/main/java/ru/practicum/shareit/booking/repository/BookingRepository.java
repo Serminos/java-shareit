@@ -19,7 +19,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findAllByBookerIdAndStartAfter(Long userId, LocalDateTime time, Sort sort);
 
-    List<Booking> findAllByBookerIdAndStatusIs(Long userId, String status, Sort sort);
+    List<Booking> findAllByBookerIdAndStatusIs(Long userId, StatusType status, Sort sort);
 
     List<Booking> findAllByItemOwnerId(Long userId, Sort sort);
 
@@ -30,7 +30,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findAllByItemOwnerIdAndStartAfter(Long userId, LocalDateTime time, Sort sort);
 
-    List<Booking> findAllByItemOwnerIdAndStatusIs(Long userId, String status, Sort sort);
+    List<Booking> findAllByItemOwnerIdAndStatusIs(Long userId, StatusType status, Sort sort);
 
     List<Booking> findAllByBookerIdAndItemIdAndStatusEqualsAndEndIsBefore(Long userId,
                                                                           Long itemId,

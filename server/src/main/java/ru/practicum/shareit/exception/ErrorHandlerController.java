@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.shareit.booking.BookingController;
 import ru.practicum.shareit.exception.exception.BadRequestException;
-import ru.practicum.shareit.exception.exception.ConflictException;
 import ru.practicum.shareit.exception.exception.ErrorResponse;
 import ru.practicum.shareit.exception.exception.NotFoundException;
 import ru.practicum.shareit.item.ItemController;
@@ -49,13 +48,6 @@ public class ErrorHandlerController {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BadRequestException.class)
     public ErrorResponse handleValidationExceptions(BadRequestException e) {
-        log.info("Ошибка сервера: {}", e.getMessage());
-        return new ErrorResponse(e.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(ConflictException.class)
-    public ErrorResponse handleValidationExceptions(ConflictException e) {
         log.info("Ошибка сервера: {}", e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
