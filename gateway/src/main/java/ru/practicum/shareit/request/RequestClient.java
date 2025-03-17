@@ -10,6 +10,8 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.client.BaseClient;
 import ru.practicum.shareit.request.dto.RequestDto;
 
+import java.util.Map;
+
 @Service
 public class RequestClient extends BaseClient {
     private static final String API_PREFIX = "/requests";
@@ -32,8 +34,8 @@ public class RequestClient extends BaseClient {
         return get("", userId);
     }
 
-    public ResponseEntity<Object> findAllExceptUserId(Long userId) {
-        return post("/all", userId);
+    public ResponseEntity<Object> findAllExceptUserId(Long userId, int from, int size) {
+        return get("/all", userId, Map.of("from", from, "size", size));
     }
 
     public ResponseEntity<Object> getByRequestId(Long requestId) {

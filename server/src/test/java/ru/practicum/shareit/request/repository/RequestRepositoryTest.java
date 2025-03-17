@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.user.model.User;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @DataJpaTest
 class RequestRepositoryTest {
     final LocalDateTime now = LocalDateTime.now().withNano(0);
@@ -60,13 +62,17 @@ class RequestRepositoryTest {
 
         List<Request> result = requestRepository.findAllByRequestorIdNot(
                 testUser1.getId(),
-                sortByCreatedDesc()
+                pageFirst10SortByCreatedDesc()
         );
 
         assertThat(result)
                 .hasSize(2)
                 .extracting(Request::getDescription)
                 .containsExactly(request3.getDescription(), request2.getDescription());
+    }
+
+    private PageRequest pageFirst10SortByCreatedDesc() {
+        return PageRequest.of(0 / 10, 10, Sort.by(Sort.Direction.DESC, "created"));
     }
 
     private Sort sortByCreatedDesc() {
@@ -82,9 +88,9 @@ class RequestRepositoryTest {
 
     private Request createAndSaveRequest(String description, User requestor, LocalDateTime created) {
         Request request = Request.builder()
-        .description(description)
-        .requestor(requestor)
-        .created(created).build();
+                .description(description)
+                .requestor(requestor)
+                .created(created).build();
         return requestRepository.save(request);
     }
 }

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.request.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,9 +78,11 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public List<RequestResponseDto> findAllExceptUserId(Long userId) {
+    public List<RequestResponseDto> findAllExceptUserId(Long userId, int from, int size) {
         checkUserExists(userId);
-        List<Request> requests = requestRepository.findAllByRequestorIdNot(userId, SORT_BY_CREATED_DESC);
+        PageRequest page = PageRequest.of(from / size, size, SORT_BY_CREATED_DESC);
+
+        List<Request> requests = requestRepository.findAllByRequestorIdNot(userId, page);
         return requests.stream()
                 .map(request -> {
                     RequestResponseDto requestResponseDto = requestMapper.toRequestResponseDto(request);

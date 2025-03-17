@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.exception.exception.NotFoundException;
 import ru.practicum.shareit.item.mapper.ItemMapper;
@@ -121,11 +122,11 @@ class RequestServiceTest {
 
     @Test
     void findAllExceptUserId_WhenExceptUser_ReturnsRequests() {
-        when(requestRepository.findAllByRequestorIdNot(USER_ID, sortByCreatedDesc()))
+        when(requestRepository.findAllByRequestorIdNot(USER_ID, pageFirst10SortByCreatedDesc()))
                 .thenReturn(List.of(request1, request2));
         when(userRepository.existsById(USER_ID)).thenReturn(true);
 
-        List<RequestResponseDto> result = requestService.findAllExceptUserId(USER_ID);
+        List<RequestResponseDto> result = requestService.findAllExceptUserId(USER_ID, 0, 10);
 
         assertThat(result)
                 .hasSize(2)
@@ -156,6 +157,10 @@ class RequestServiceTest {
 
     private Sort sortByCreatedDesc() {
         return Sort.by(Sort.Direction.DESC, "created");
+    }
+
+    private PageRequest pageFirst10SortByCreatedDesc() {
+        return PageRequest.of(0 / 10, 10, Sort.by(Sort.Direction.DESC, "created"));
     }
 
     private User createUser(long id, String name, String email) {

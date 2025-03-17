@@ -10,7 +10,7 @@ public interface RequestService {
 
     List<RequestResponseDto> getAllByUserId(Long userId);
 
-    List<RequestResponseDto> findAllExceptUserId(Long userId);
+    List<RequestResponseDto> findAllExceptUserId(Long userId, int from, int size);
 
     RequestResponseDto getByRequestId(Long requestId);
 }

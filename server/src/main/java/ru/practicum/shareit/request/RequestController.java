@@ -35,10 +35,12 @@ public class RequestController {
     }
 
     @GetMapping("/all")
-    public List<RequestResponseDto> findAllExceptUserId(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public List<RequestResponseDto> findAllExceptUserId(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                                        @RequestParam(name = "from", defaultValue = "0") int from,
+                                                        @RequestParam(name = "size", defaultValue = "10") int size) {
         log.info("Запрос на получение всех запросов(вещей), кроме тех что сделал пользователь с id = [{}]",
                 userId);
-        return itemRequestService.findAllExceptUserId(userId);
+        return itemRequestService.findAllExceptUserId(userId, from, size);
     }
 
     @GetMapping("/{requestId}")

@@ -2,6 +2,7 @@ package ru.practicum.shareit.request;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -44,10 +45,14 @@ public class RequestController {
     @GetMapping("/all")
     public ResponseEntity<Object> findAllExceptUserId(@RequestHeader(USER_ID_HEADER)
                                                       @Positive(message = "User ID " + ID_VALIDATION_MSG)
-                                                      Long userId) {
+                                                      Long userId,
+                                                      @PositiveOrZero @RequestParam(name = "from", defaultValue = "0")
+                                                      int from,
+                                                      @Positive @RequestParam(name = "size", defaultValue = "10")
+                                                      int size) {
         log.info("Запрос на получение всех запросов(вещей), кроме тех что сделал пользователь с id = [{}]",
                 userId);
-        return requestClient.findAllExceptUserId(userId);
+        return requestClient.findAllExceptUserId(userId, from, size);
     }
 
     @GetMapping("/{requestId}")

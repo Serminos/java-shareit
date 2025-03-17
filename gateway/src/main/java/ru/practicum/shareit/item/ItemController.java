@@ -31,6 +31,8 @@ public class ItemController {
                                       Long userId,
                                       @Validated(CreateObject.class) @RequestBody ItemDto itemDto) {
         log.info("Создание вещи пользователем ID: [{}]", userId);
+        if (itemDto.getRequestId() != null)
+            log.info("Указан запрос requestID: [{}]", itemDto.getRequestId());
         return itemClient.add(userId, itemDto);
     }
 
